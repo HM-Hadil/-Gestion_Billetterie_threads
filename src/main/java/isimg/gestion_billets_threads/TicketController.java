@@ -23,6 +23,16 @@ import java.util.List;
             return "Connexion réussie !";
         }
 
+
+        // Endpoint pour réserver un ticket
+        @PostMapping("/reserve/{ticketId}/{reserverName}")
+        public String reserveTickethread(@PathVariable Long ticketId, @PathVariable String reserverName) {
+            // Lancer la réservation dans un thread distinct
+            ticketService.reserveTicketInThread(ticketId, reserverName);
+            return "Réservation en cours pour le ticket " + ticketId + " par " + reserverName;
+        }
+
+
         // Réserver un ticket
         @PostMapping("/reserve/{ticketId}")
         public ResponseEntity<Ticket> reserveTicket(

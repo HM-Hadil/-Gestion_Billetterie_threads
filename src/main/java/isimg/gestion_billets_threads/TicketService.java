@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.Optional;
 import org.springframework.transaction.annotation.Transactional;
-
 @Service
 public class TicketService {
     @Autowired
@@ -27,6 +26,10 @@ public class TicketService {
         return ticketRepository.save(ticket);
     }
 
+    public void reserveTicketInThread(Long ticketId, String reserverName) {
+        TicketReservationThread thread = new TicketReservationThread(this, ticketId, reserverName);
+        thread.start(); // Lancer un nouveau thread pour la réservation
+    }
     // Réserver un ticket
     @Transactional
     public Ticket reserveTicket(Long ticketId, String reserverName) {
@@ -43,6 +46,7 @@ public class TicketService {
 
         throw new IllegalArgumentException("Ticket non trouvé");
     }
+
 
     // Annuler une réservation
     @Transactional

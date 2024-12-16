@@ -65,7 +65,9 @@ public class Ticket {
 
     // Getters et setters (ajoutez ceux pour les nouveaux champs)
     // ... (précédents getters et setters)
-
+    public Long getId() {
+        return id;
+    }
     public LocalDateTime getShowDate() { return showDate; }
     public void setShowDate(LocalDateTime showDate) { this.showDate = showDate; }
 
