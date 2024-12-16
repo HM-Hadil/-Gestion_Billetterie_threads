@@ -3,45 +3,73 @@ package isimg.gestion_billets_threads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TicketService {
-
     @Autowired
     private TicketRepository ticketRepository;
-    @Autowired
-    private RéservationRepository réservationRepository;
 
+    // Créer un nouveau ticket
+    @Transactional
+    public Ticket createTicket(TicketCreationDTO ticketDTO) {
+        Ticket ticket = new Ticket(
+                ticketDTO.getSpectacleName(),
+                ticketDTO.getShowDate(),
+                ticketDTO.getPrice(),
+                ticketDTO.getSeatNumber()
+        );
+        return ticketRepository.save(ticket);
+    }
 
-    // Réservation d'un billet
-    public synchronized boolean réserverBillet(Long billetId, Long utilisateurId) {
-        Optional<Ticket> billetOpt = ticketRepository.findById(billetId);
-        if (billetOpt.isPresent() && !billetOpt.get().isReserved()) {
-            Ticket billet = billetOpt.get();
-            billet.setReserved(true);
-            ticketRepository.save(billet);
-            Réservation réservation = new Réservation();
-            réservation.setBilletId(billetId);
-            réservation.setUtilisateurId(utilisateurId);
-            réservation.setDateRéservation(LocalDateTime.now());
-            réservationRepository.save(réservation);
-            return true;
+    // Réserver un ticket
+    @Transactional
+    public Ticket reserveTicket(Long ticketId, String reserverName) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(ticketId);
+
+        if (optionalTicket.isPresent()) {
+            Ticket ticket = optionalTicket.get();
+            if (ticket.reserve(reserverName)) {
+                return ticketRepository.save(ticket);
+            } else {
+                throw new IllegalStateException("Ticket déjà réservé");
+            }
         }
-        return false; }
 
-    public synchronized void annulerRéservation(Long billetId) {
-        Optional<Ticket> billetOpt = ticketRepository.findById(billetId);
-        if (billetOpt.isPresent() && billetOpt.get().isReserved()) {
-            Ticket billet = billetOpt.get();
-            billet.setReserved(false);
-            ticketRepository.save(billet);
-            List<Réservation> réservations = réservationRepository.findByBilletId(billetId);
-            for (Réservation réservation : réservations) {
-                réservationRepository.delete(réservation);
-            } } }
+        throw new IllegalArgumentException("Ticket non trouvé");
+    }
 
+    // Annuler une réservation
+    @Transactional
+    public Ticket cancelReservation(Long ticketId) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(ticketId);
 
+        if (optionalTicket.isPresent()) {
+            Ticket ticket = optionalTicket.get();
+            ticket.cancelReservation();
+            return ticketRepository.save(ticket);
         }
+
+        throw new IllegalArgumentException("Ticket non trouvé");
+    }
+
+    // Obtenir tous les tickets pour un spectacle
+    public List<Ticket> getTicketsBySpectacle(String spectacleName) {
+        return ticketRepository.findBySpectacleName(spectacleName);
+    }
+
+    // Obtenir les tickets disponibles pour un spectacle
+    public List<Ticket> getAvailableTickets(String spectacleName) {
+        return ticketRepository.findBySpectacleNameAndReservedFalse(spectacleName);
+    }
+
+    // Obtenir les tickets réservés par un utilisateur
+    public List<Ticket> getReservedTickets(String reserverName) {
+        return ticketRepository.findByReservedByAndReservedTrue(reserverName);
+    }
+}
