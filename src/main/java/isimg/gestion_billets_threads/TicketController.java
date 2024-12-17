@@ -8,6 +8,7 @@ import java.util.List;
 
     @RestController
     @RequestMapping("/api/tickets")
+    @CrossOrigin("http://localhost:4200/")
     public class TicketController {
         @Autowired
         private TicketService ticketService;
@@ -32,31 +33,13 @@ import java.util.List;
             return "Réservation en cours pour le ticket " + ticketId + " par " + reserverName;
         }
 
-
-        // Réserver un ticket
-        @PostMapping("/reserve/{ticketId}")
-        public ResponseEntity<Ticket> reserveTicket(
-                @PathVariable Long ticketId,
-                @RequestParam String reserverName
-        ) {
-            try {
-                Ticket reservedTicket = ticketService.reserveTicket(ticketId, reserverName);
-                return ResponseEntity.ok(reservedTicket);
-            } catch (IllegalStateException | IllegalArgumentException e) {
-                return ResponseEntity.badRequest().body(null);
-            }
+        @PostMapping("/cancelThread/{ticketId}")
+        public String cancelTickethread(@PathVariable Long ticketId) {
+            // Lancer la réservation dans un thread distinct
+            ticketService.cancelTicketInThread(ticketId);
+            return "Réservation  ticket annulée" ;
         }
 
-        // Annuler une réservation
-        @PostMapping("/cancel/{ticketId}")
-        public ResponseEntity<Ticket> cancelReservation(@PathVariable Long ticketId) {
-            try {
-                Ticket canceledTicket = ticketService.cancelReservation(ticketId);
-                return ResponseEntity.ok(canceledTicket);
-            } catch (IllegalArgumentException e) {
-                return ResponseEntity.notFound().build();
-            }
-        }
 
         // Obtenir tous les tickets d'un spectacle
         @GetMapping("/spectacle/{spectacleName}")
@@ -77,5 +60,12 @@ import java.util.List;
         public ResponseEntity<List<Ticket>> getReservedTickets(@PathVariable String reserverName) {
             List<Ticket> reservedTickets = ticketService.getReservedTickets(reserverName);
             return ResponseEntity.ok(reservedTickets);
+        }
+
+        // Endpoint pour récupérer tous les tickets disponibles
+        @GetMapping("/available")
+        public ResponseEntity<List<Ticket>> getAllAvailableTickets() {
+            List<Ticket> availableTickets = ticketService.getAllAvailableTickets();
+            return ResponseEntity.ok(availableTickets);
         }
 }

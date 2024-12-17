@@ -12,6 +12,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     // Rechercher des tickets disponibles pour un spectacle
     List<Ticket> findBySpectacleNameAndReservedFalse(String spectacleName);
+    List<Ticket> findByReservedFalse();
 
     // Rechercher les tickets réservés par un utilisateur
     List<Ticket> findByReservedByAndReservedTrue(String reserverName);

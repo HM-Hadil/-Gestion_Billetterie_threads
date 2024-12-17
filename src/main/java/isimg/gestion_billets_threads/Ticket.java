@@ -2,11 +2,7 @@ package isimg.gestion_billets_threads;
 
 import jakarta.persistence.*;
 
-
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.concurrent.Semaphore;
-
 
 @Entity
 public class Ticket {
@@ -63,23 +59,56 @@ public class Ticket {
         this.reservationTime = null;
     }
 
-    // Getters et setters (ajoutez ceux pour les nouveaux champs)
-    // ... (précédents getters et setters)
+    // Getters et setters
     public Long getId() {
         return id;
     }
-    public LocalDateTime getShowDate() { return showDate; }
-    public void setShowDate(LocalDateTime showDate) { this.showDate = showDate; }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public String getSpectacleName() {
+        return spectacleName;
+    }
 
-    public int getSeatNumber() { return seatNumber; }
-    public void setSeatNumber(int seatNumber) { this.seatNumber = seatNumber; }
+    public void setSpectacleName(String spectacleName) {
+        this.spectacleName = spectacleName;
+    }
 
-    public String getReservedBy() { return reservedBy; }
-    public void setReservedBy(String reservedBy) { this.reservedBy = reservedBy; }
+    public LocalDateTime getShowDate() {
+        return showDate;
+    }
 
-    public LocalDateTime getReservationTime() { return reservationTime; }
-    public void setReservationTime(LocalDateTime reservationTime) { this.reservationTime = reservationTime; }
+    public void setShowDate(LocalDateTime showDate) {
+        this.showDate = showDate;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getSeatNumber() {
+        return seatNumber;
+    }
+
+    public void setSeatNumber(int seatNumber) {
+        this.seatNumber = seatNumber;
+    }
+
+    public String getReservedBy() {
+        return reservedBy;
+    }
+
+    public void setReservedBy(String reservedBy) {
+        this.reservedBy = reservedBy;
+    }
+
+    public LocalDateTime getReservationTime() {
+        return reservationTime;
+    }
+
+    public void setReservationTime(LocalDateTime reservationTime) {
+        this.reservationTime = reservationTime;
+    }
 }

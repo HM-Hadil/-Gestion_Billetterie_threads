@@ -30,6 +30,14 @@ public class TicketService {
         TicketReservationThread thread = new TicketReservationThread(this, ticketId, reserverName);
         thread.start(); // Lancer un nouveau thread pour la réservation
     }
+    // Annuler une réservation (thread)
+    public void cancelTicketInThread(Long ticketId) {
+        TicketCancellationThread thread = new TicketCancellationThread(this, ticketId);
+        thread.start(); // Lancer un nouveau thread pour annuler la réservation
+    }
+
+
+
     // Réserver un ticket
     @Transactional
     public Ticket reserveTicket(Long ticketId, String reserverName) {
@@ -76,4 +84,9 @@ public class TicketService {
     public List<Ticket> getReservedTickets(String reserverName) {
         return ticketRepository.findByReservedByAndReservedTrue(reserverName);
     }
+
+    public List<Ticket> getAllAvailableTickets() {
+        return ticketRepository.findByReservedFalse();
+    }
+
 }
